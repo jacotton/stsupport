@@ -1,0 +1,69 @@
+STsupport
+
+(c) James Cotton, 2006-2009 
+j.a.cotton@qmul.ac.uk
+
+stsupport is a simple C++ program to calculate the supertree support measures described in Wilkinson, Pisani, Cotton and Corfe (2005, Systematic Biology)
+
+INTRODUCTION
+
+stsupport is a simple, command-line program which implements the supertree support measures described in:
+
+Mark Wilkinson, Davide Pisani, James Cotton and Ian Corfe (2005) Measuring Support and Finding Unsupported Relationships in Supertrees. Systematic Biology 54(5):823-831
+available from my publications page
+
+We'd like you to cite this paper whenever you use this software, which you'll probably do anyway, otherwise readers won't know what you've done. There is no separate citation for this simple program. An up-to-date citation for it (and a preprint you can download) should be available at James Cotton's publications page.
+
+THE METHOD
+
+You'll probably want to read the paper for details of the method, anyway, but i'll try and summarise the ideas here, in any case. The paper was written as a response to Olaf Bininda-Emonds paper
+
+INSTALLATION
+
+
+SOURCE CODE VERSION
+
+If you've downloaded the source code version, you should have a single file, stsupport.tgz. This file is a gnuzipped tar file. On most unix systems (including Mac OS X), you should be able to extract it by:
+
+prompt> tar -zxvf stsupport.tgz
+or..
+
+prompt> gunzip stsupport.tgz
+prompt> tar -xvf stsupport.tar
+If either of these work, you should get a directory called stsupport. This contains everything - the source files, a (very primitive) makefile, and two exanmple files (KennedyPageData.nex and KennedyPageData.phylip). To compile the program, you should be able to just type:
+
+prompt> cd stsupport
+prompt> make all
+You'll get some warnings about deprecated names of header files, but all being well, and after a few minutes you should get the program. To check if its working, try:
+
+prompt>./stsupport KennedyPageData.nex test.out
+If this seems to work OK, then you're done. If the program fails to compile, bear in mind its only been tested on Mac OS X 10.3 and redhat Linux. The most likely thing is that you'll need to change the name of your C++ compiler - this is the string following the line "CXX =" right at the top of the makefile, so is easy. The other problem some people will come across is that the names of certain header files have changed following standardisation of C++. If you have a slightly old C++ compiler, you may get some errors like "iostream: No such file or directory" for a few files. If this happens to you, you should be able to edit the appropriate files and change things like "#include <iostream>" to "#include <iostream.h>", or you could update your C++, or get in touch with me (j.a.cotton@qmul.ac.uk) with details of the problem and i'll try and fix it. I should really add conditional flags to the source code to fix this already, but haven't got time or inclination just now. If you e-mail me, it might prompt me to bother!
+
+USAGE
+
+The program is very simple, and has few options and things to worry about. Just type:
+
+prompt> ./stsupport 
+Where is a nexus or phylip-style treefile where the first tree is the supertree, or at least a tree that contains all of the leaves from the other trees in the file. There must be at least one additional tree in the file, too, which represents an input or source tree. There can be any number of other trees, but the program will only compute support values for a single supertree at a time, and that's always the first tree. The output file will contain a single line, of tab and space-delimeted values as follows:
+
+
+The first number is the number of input trees in the file (i.e. the number of trees minus 1)
+The second number is the number of taxa in the supertree
+The third number is the mean completeness of the input trees, i.e. the mean fraction of supertree taxa present on the input trees
+This is followed by two numbers in parentheses, which are the minimum and maximum of the completeness across the input trees
+The next figure is the number of clades in the supertree, so you know its level of resolution
+The next four figures represent the number of supertree clades in different categories.. let S be the number of input trees supporting a supertree clade, Q the number conflicting with it, and I the number that are irrelevant, and N the number of input trees, then they are (in order):
+u1 = The number of clades with zero support (i.e. with S = 0)
+u2 = The number of clades with zero support and non-zero conflict (with S=0, Q > 0)
+u3 = The number of clades with zero support and more than half of the input trees that could conflict with it actually conflicting, i.e. S=0, Q > (N-I)/2
+u4 = The number of clades with zero support and all of the input trees that could conflict with it actually conflicting, i.e. S=0. Q = N-I
+u5 = The number of clades with zero support and all input trees conflicting, i.e. S=0, Q=N (this requires that I=0, which is probably too strong a requirement for real data)
+The final three sets of numbers are means across clades and ranges (min and max) for three different metrics, V, V+ and V-. For this to make sense, and to see proper definitions of all these numbers, you should look at Mark Wilkinson, Davide Pisani, James Cotton and Ian Corfe (2005) Measuring Support and Finding Unsupported Relationships in Supertrees. Systematic Biology. This will be out shortly, and is available from my my publications page at http://taxonomy.zoology.gla.ac.uk/~jcotton/pubs.htm
+
+These figures are repeated as the last line of the output at the standard verbosity settting. Other interesting information is only provided to std out during the program's execution, so it might be useful to pipe this to a file using:
+
+prompt> ./stsupport {DATAFILE} {OUTFILE} > {MOREOUTPUT}
+
+This information includes, for each supertree clade, the values of S, Q and P (as defined above, P is the number of input trees PERMITTING the clade). Other information is output if the verbosity level is set higher, using the switch -b n for some n like 3,4,5 or even higher.
+
+Note that if the input trees don't have the [&R] flag in the nexus format, or if they are in phylip format, the program will report them as being "unrooted" when reading the file, but will treat all the trees as rooted irrespective of this! Sorry.
